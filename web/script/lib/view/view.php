@@ -18,7 +18,7 @@ class view
         echo "\n<title>", $title . "</title>\n";
         // 输出oh变量
         echo $oh;
-        
+
         echo "</head>\n";
         // 引入导航文件
         include includeViewer("nav");
@@ -31,7 +31,6 @@ class view
         // 输出容器结束
         echo "</div>";
         // 引入尾部文件
-        global $config;
         include includeViewer("foot");
         view::import();
     }
@@ -50,18 +49,18 @@ class view
         document.getElementById('$id').innerHTML = marked.parse(`" . str_replace("`", "\`", addslashes($text)) . "`);
         </script>";
     }
-    public static function jsMdLt_GetOnly($id = "pFace",$noecho=0)
+    public static function jsMdLt_GetOnly($id = "pFace", $noecho = 0)
     {
         // 输出JSMarkdown解析器
-        $s= "
+        $s = "
         <script>
         document.getElementById('$id').innerHTML = marked.parse(document.getElementById('$id').innerHTML);
         </script>";
-    if($noecho){
-        return $s;
-    }else{
-        echo $s;
-    }
+        if ($noecho) {
+            return $s;
+        } else {
+            echo $s;
+        }
     }
     public static function alert($text, $type = "info", $currenttime = 5000)
     {
@@ -129,7 +128,7 @@ class view
         exit;
     }
 
-    public static function aceeditor($code="", $language = "c_cpp",$rl=0,$outname="")
+    public static function aceeditor($code = "", $language = "c_cpp", $rl = 0, $outname = "")
     {
         global $editorthemeid;
         $code = str_replace("`", "\`", $code);
@@ -137,7 +136,7 @@ class view
         $id = 0;
         if (!$viewimport['temp']['acecnt']) $viewimport['temp']['acecnt'] = 1;
         else $id = $viewimport['temp']['acecnt']++;
-        if($outname==""){
+        if ($outname == "") {
             $outname = "ace-$id";
         }
         echo <<<HTML
@@ -148,85 +147,102 @@ class view
         editors[$id].insert(`$code`);
         editors[$id].setTheme("ace/theme/$editorthemeid");
         </script>
-HTML; 
+HTML;
         return $id;
     }
-    public static function chart($vals){
+    public static function chart($vals)
+    {
         echo "<canvas id=\"chart-" . ($vals['id'] ? $vals['id'] : "") . "\"></canvas>";
         echo "<script>showChart(`" . json_encode($vals) . "`)</script>";
     }
 }
-$myThemeCfg=[];
-$myThemeID='light';
-$editorthemeid="tomorrow";
-class theme{
-    static public function getCfg_user($userid){
+$myThemeCfg = [];
+$myThemeID = 'light';
+$editorthemeid = "tomorrow";
+class theme
+{
+    static public function getCfg_user($userid)
+    {
         return DB::getdata("theme/user/$userid");
     }
-    static public function getCfg_Common($id){
+    static public function getCfg_Common($id)
+    {
         return DB::getdata("theme/common/$id");
     }
-    static public function solveid($id){
-        return explode("/",$id);
+    static public function solveid($id)
+    {
+        return explode("/", $id);
     }
-    static public function changemy($newid){
+    static public function changemy($newid)
+    {
         global $myThemeID;
-        if($newid!=='self' && theme::getCfg_Common($newid)===[]) return false;
-        $myThemeID=$newid;
+        if ($newid !== 'self' && theme::getCfg_Common($newid) === []) return false;
+        $myThemeID = $newid;
         return theme::saveChange();
     }
-    static public function changeid($neweid){
+    static public function changeid($neweid)
+    {
         global $editorthemeid;
-        $editorthemeid=$neweid; //编辑器主题
+        $editorthemeid = $neweid; //编辑器主题
         return theme::saveChange();
     }
 
-    static public function saveChange(){
-        global $myThemeCfg,$myThemeID,$editorthemeid;
-        $cfgU=array(
-            "theme"=>$myThemeID,
-            "selfset"=>$myThemeID==='self'?$myThemeCfg:[],
-            "editortheme"=>$editorthemeid,
+    static public function saveChange()
+    {
+        global $myThemeCfg, $myThemeID, $editorthemeid;
+        $cfgU = array(
+            "theme" => $myThemeID,
+            "selfset" => $myThemeID === 'self' ? $myThemeCfg : [],
+            "editortheme" => $editorthemeid,
         );
-        return DB::putdata("theme/user/".user::read()['name'],$cfgU);
+        return DB::putdata("theme/user/" . user::read()['name'], $cfgU);
     }
-    static public function init(){
-        global $mypower,$myThemeCfg,$myThemeID,$editorthemeid;
-        if($mypower<=0) {
-            $myThemeCfg=theme::getCfg_Common("light");
-        }
-        else{
-            $mycfg=theme::getCfg_user(user::read()['name']); 
-            if(empty($mycfg)){
-                $myThemeCfg= theme::getCfg_Common("light");
-                $myThemeID='light';
-            }else{
-                if($mycfg['theme']==='self'){
-                    $myThemeCfg= $mycfg['selfset'];
-                    $myThemeID='self';
-                }else{
-                    $myThemeCfg= theme::getCfg_Common($mycfg['theme']);
-                    $myThemeID=$mycfg['theme'];
+    static public function init()
+    {
+        global $mypower, $myThemeCfg, $myThemeID, $editorthemeid;
+        if ($mypower <= 0) {
+            $myThemeCfg = theme::getCfg_Common("light");
+        } else {
+            $mycfg = theme::getCfg_user(user::read()['name']);
+            if (empty($mycfg)) {
+                $myThemeCfg = theme::getCfg_Common("light");
+                $myThemeID = 'light';
+            } else {
+                if ($mycfg['theme'] === 'self') {
+                    $myThemeCfg = $mycfg['selfset'];
+                    $myThemeID = 'self';
+                } else {
+                    $myThemeCfg = theme::getCfg_Common($mycfg['theme']);
+                    $myThemeID = $mycfg['theme'];
                 }
             }
-            if($mycfg['editortheme']){
-                $editorthemeid=$mycfg['editortheme'];
+            if ($mycfg['editortheme']) {
+                $editorthemeid = $mycfg['editortheme'];
             }
         }
         return 1;
     }
-    static public function css($mycfg=[]){
-        if($mycfg===[]){
+    static public function css($mycfg = [])
+    {
+        if ($mycfg === []) {
             global $myThemeCfg;
-            $mycfg=$myThemeCfg;
+            $mycfg = $myThemeCfg;
         }
-        $frontcolor=$mycfg['frontcolor'];
-        $backcolor=$mycfg['backcolor'];
-        $subbackcolor=$mycfg['subbackcolor']??'rgba(255, 255, 255, 0.9)';
-        $activecolor=$mycfg['activecolor'];
-        $barcolor=$mycfg['barcolor'];
-        $barfcolor=$mycfg['barfcolor'];
+        $frontcolor = $mycfg['frontcolor'];
+        $backcolor = $mycfg['backcolor'];
+        $subbackcolor = $mycfg['subbackcolor'] ?? 'rgba(255, 255, 255, 0.9)';
+        $activecolor = $mycfg['activecolor'];
+        $barcolor = $mycfg['barcolor'];
+        $barfcolor = $mycfg['barfcolor'];
         return <<<CSS
+:root{
+    --frontcolor: $frontcolor;
+    --backcolor: $backcolor;
+    --subbackcolor: $subbackcolor;
+    --activecolor: $activecolor;
+    --barcolor: $barcolor;
+    --barfcolor: $barfcolor
+}
 body{
     color: $frontcolor;
     background:none;
@@ -245,30 +261,15 @@ body::before{
     background-size:cover;
     opacity:0.8;
 }
-.nav-item a:visited,.nav-item a:link,.navbar-brand{
-    color: $barfcolor;
-    font-weight: 600;
-}
-.nav-item a:hover,.navbar-brand:hover{
-    color: $frontcolor;
-    font-weight: 800;
-    text-shadow: 1px 2px 2px gainsboro;
-    border-bottom: 1px solid pink;
-}
 
 .navtopc{
     background: $barcolor;
     color: $barfcolor;
-}.left-nav-item>button{
-    color: $barfcolor;
 }
+
 .navmainc{
     background: $backcolor;
     color:$frontcolor;
-}
-
-.active-item{
-    border-bottom: 2px solid $activecolor;
 }
 
 CSS;

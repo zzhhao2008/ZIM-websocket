@@ -31,3 +31,6 @@
     bottom: 0;
     width: 100%;
 }
+.left-nav-item>button{
+    color: var(--barfcolor);
+}
