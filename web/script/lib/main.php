@@ -73,7 +73,7 @@ function nav_icon($id, $id2)
 	}
 }
 $navitems=array("help");//设置导航栏的内容
-$comname="ZIM-Polling";//设置网站名称
+$comname="ZIM";//设置网站名称
 if ($comname === '') $comname = 'default';
 include includeLib("basic/data");
 include includeLib("basic/time");
