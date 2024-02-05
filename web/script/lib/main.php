@@ -52,6 +52,9 @@ function jsjump($u)
 {
     echo "<script>window.location='$u'</script>";
 }
+function jump_JS($u) {
+    return "window.location='$u'";
+}
 function jsreload()
 {
     echo "<script>window.location.reload()</script>";
@@ -60,6 +63,14 @@ function jsreload()
 function getstatic($name)
 {
     return file_get_contents("static/$name");
+}
+function nav_icon($id, $id2)
+{
+	if ($id2 === Router::getUri()) {
+		return view::icon($id . "-fill");
+	} else {
+		return view::icon($id);
+	}
 }
 $navitems=array("help");//设置导航栏的内容
 $comname="ZIM-Polling";//设置网站名称

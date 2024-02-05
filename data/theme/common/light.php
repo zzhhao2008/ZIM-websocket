@@ -5,6 +5,6 @@ return array(
     "backcolor"=>'rgb(239, 239, 239)',
     'activecolor'=>'#FFFF00',
     "barcolor"=>"#DDDDDD",
-    "barfcolor"=>"rgb(75, 64, 64)",
+    "barfcolor"=>"rgb(0,0,0)",
     
 );

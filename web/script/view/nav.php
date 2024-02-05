@@ -1,32 +1,19 @@
-<style>
-	.left-nav {
-		position: fixed;
-		left: 0;
-		top: 0;
-		width: 50px;
-		height: 100vh;
-	}
-
-	.left-nav-item {
-		text-align: center;
-	}
-
-	.left-nav-item>a {
-		filter: grayscale(1) contrast(999) invert(1);
-		line-height: 50px;
-		height: 50px;
-		display: block;
-		font-size: larger;
-		font-weight: 600;
-	}
-	.left-nav-item>a:hover {
-		background: rgba(255,255,255,0.1);
-		text-shadow: 0 0 5px #000;
-	}
-</style>
 <nav class="left-nav navtopc">
 	<div class="left-nav-item">
-		<a id="naver"><?= view::icon("chat-dots") ?></a>
-		<a><?= view::icon("people") ?></a>
+		<button onclick="<?= jump_JS("/") ?>" data-bs-toggle="tooltip" data-bs-placement="right" title="消息列表">
+			<?= nav_icon("chat-dots", "/") ?>
+		</button>
+		<button onclick="<?= jump_JS("/fmanage") ?>" data-bs-toggle="tooltip" data-bs-placement="right" title="好友/群管理">
+			<?= nav_icon("people", "fmanage") ?>
+		</button>
+
+	</div>
+	<div class="left-nav-item left-nav-item-bottom">
+		<button onclick="<?= jump_JS("/themeset") ?>" data-bs-toggle="tooltip" data-bs-placement="right" title="主题设置">
+			<?= nav_icon("brush", "themeset") ?>
+		</button>
+		<button onclick="<?= jump_JS("/profile") ?>" data-bs-toggle="tooltip" data-bs-placement="right" title="个人中心">
+			<?= nav_icon("person", "profile") ?>
+		</button>
 	</div>
 </nav>

@@ -230,7 +230,8 @@ class theme{
 body{
     color: $frontcolor;
     background:none;
-    padding-left:50px;
+    padding-left:60px;
+    overflow:hidden;
 }
 body::before{
     content: "";
@@ -257,6 +258,9 @@ body::before{
 
 .navtopc{
     background: $barcolor;
+    color: $barfcolor;
+}.left-nav-item>button{
+    color: $barfcolor;
 }
 .navmainc{
     background: $backcolor;
