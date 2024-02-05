@@ -27,7 +27,7 @@
     font-weight: 500;
 }
 
-.msg-menu>.msg-menu-body {
+.msg-menu .msg-menu-item {
     height: 60px;
     border-bottom: 1px solid var(--subbackcolor);
 }

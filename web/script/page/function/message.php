@@ -3,20 +3,8 @@
     <div class="headbar">
         消息列表
     </div>
-    <div class="msg-menu-body">
-        <div class="msg-menu-item">
-            <div class="msg-chatmsg">
-                <div class="firstrow">
-                    <span class="left">
-                        群的名字
-                    </span>
-                    <span class="right">
-                        1:44
-                    </span>
-                </div>
-                <span class="msg-chatmsg-detial"></span>
-            </div>
-        </div>
+    <div class="msg-menu-body" id="msgbox">
+    
     </div>
 </div>
 <?php view::foot() ?>
