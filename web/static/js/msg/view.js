@@ -72,15 +72,19 @@ function addMsgbox(msgid, msgnew) {
     }
 
 }
-function viewChatWindow(cfg) {
+function viewChatWindow(id,cfg) {
     chatWindow.className = "ChatWindow ChatWindow-show";
     msgmenu.className = "msg-menu menu-notshow";
     document.getElementById("chatWindow-name").innerHTML = strFormpt(cfg['name']);
     chatInput.focus();
+    document.getElementById("Chatmsg-" +id).className += " active";
+    if(nowChatingId!=-1)
+    document.getElementById("Chatmsg-" +nowChatingId).className = "msg-chatmsg";
 }
-function disViewChatWindow() {
+function disViewChatWindow(id) {
     chatWindow.className = "ChatWindow ChatWindow-notshow";
     msgmenu.className = "msg-menu menu-show";
+    document.getElementById("Chatmsg-" +id).className = "msg-chatmsg"
 }
 function createNewMsg(cfg) {
     /*
@@ -93,6 +97,9 @@ function createNewMsg(cfg) {
     */
     var newline = document.createElement("div");
     newline.className = "msg-line";
+    if(cfg['id']===userid){
+        newline.className = " msg-line-mine";
+    }
     var nameline = document.createElement("div");
     nameline.className = "nameline";
     nameline.innerHTML = strFormpt(cfg['name']);

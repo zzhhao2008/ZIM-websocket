@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/static/css/tool.css">
 <link rel="stylesheet" href="/static/css/nav.css">
 <link rel="stylesheet" href="/static/css/msg-main.css">
+<link rel="stylesheet" href="/static/css/fm-main.css">
 <link rel="stylesheet" href="/static/bootstrap/icons/bootstrap-icons.css">
 
 <script src="/static/bootstrap/5.3.2/js/bootstrap.bundle.js"></script>

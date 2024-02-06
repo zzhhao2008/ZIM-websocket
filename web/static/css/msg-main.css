@@ -83,7 +83,7 @@
         left: 60px;
     }
 
-    .main {
+    .mmain {
         padding-left: 300px;
     }
 
@@ -135,7 +135,7 @@
 .msg-menu-body {
     scrollbar-width: 3px;
     max-height: calc(100vh - 50px);
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .msg-menu-body::-webkit-scrollbar {
@@ -158,6 +158,10 @@
 .msg-menu .msg-menu-item {
     height: 60px;
     border-bottom: 1px solid var(--subbackcolor);
+}
+.msg-menu .active {
+    background: var(--frontcolor);
+    color: #fff;
 }
 
 .msg-chatmsg {

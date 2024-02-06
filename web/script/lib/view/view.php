@@ -244,6 +244,7 @@ class theme
     --barfcolor: $barfcolor
 }
 body{
+    overflow-x: hidden;
     color: $frontcolor;
     background:none;
     padding-left:60px;
