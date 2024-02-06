@@ -1,6 +1,6 @@
 <?php
 if ($_GET['logout']) {
-    setcookie("login_name_code", "", time() - 3600 * 48, "/");
+    setcookie("login_name_$comname", "", time() - 3600 * 48, "/");
     jsjump("?");
 }
 view::header("我的账户");

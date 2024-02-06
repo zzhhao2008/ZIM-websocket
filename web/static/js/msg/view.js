@@ -1,13 +1,19 @@
-var chatWindow = document.getElementById("msgWindow");
-var msgmenu=document.getElementById("msg-menu");
-var chatwindow=document.getElementById("chat-body");
+chatWindow=null;
+msgmenu=null;
+function viewinit(){
+    chatWindow = document.getElementById("msgWindow");
+    msgmenu = document.getElementById("msg-menu");
+    chatBody = document.getElementById("chat-body");
+    chatInput = document.getElementById("chatWindow-input");
+}
+
 function strFormpt(str, len = 25) {
     //如果长度超出，则截断
     //如果为null，则赋值""
     //如果为undefined，则赋值""
     if (str == null) str = "";
     if (str == undefined) str = "";
-    if (str.length > len) str = str.substring(0, len)+"...";
+    if (str.length > len) str = str.substring(0, len) + "...";
     return str;
 }
 function createMsgBox(msgid, msgconfig) {
@@ -18,8 +24,8 @@ function createMsgBox(msgid, msgconfig) {
     }
     var msgbox = document.createElement("div");
     msgbox.id = "Chatmsg-" + msgid;
-    msgbox.onclick = function(){openChatWindow(msgid);}
-    
+    msgbox.onclick = function () { openChatWindow(msgid); }
+
     msgbox.className = "msg-chatmsg";
     var firstrow = document.createElement("div");
     firstrow.className = "firstrow";
@@ -68,14 +74,15 @@ function addMsgbox(msgid, msgnew) {
 }
 function viewChatWindow(cfg) {
     chatWindow.className = "ChatWindow ChatWindow-show";
-    menu.className = "msg-menu menu-notshow";
+    msgmenu.className = "msg-menu menu-notshow";
     document.getElementById("chatWindow-name").innerHTML = strFormpt(cfg['name']);
+    chatInput.focus();
 }
-function disViewChatWindow(){
+function disViewChatWindow() {
     chatWindow.className = "ChatWindow ChatWindow-notshow";
-    menu.className = "msg-menu menu-show";
+    msgmenu.className = "msg-menu menu-show";
 }
-function vcreateNewMsg(cfg){
+function createNewMsg(cfg) {
     /*
     <div class="msg-line">
             <div class="nameline">ZZH</div>
@@ -84,18 +91,27 @@ function vcreateNewMsg(cfg){
             </div>
         </div>
     */
-    var newline=document.createElement("div");
-    newline.className="msg-line";
-    var nameline=document.createElement("div");
-    nameline.className="nameline";
-    nameline.innerHTML=strFormpt(cfg['name']);
+    var newline = document.createElement("div");
+    newline.className = "msg-line";
+    var nameline = document.createElement("div");
+    nameline.className = "nameline";
+    nameline.innerHTML = strFormpt(cfg['name']);
     newline.appendChild(nameline);
-    var msgboubleline=document.createElement("div");
-    msgboubleline.className="msgboubleline";
-    var msgbouble=document.createElement("div");
-    msgbouble.className="msgbouble";
-    msgbouble.innerHTML=strFormpt(cfg['msg']);
+    var msgboubleline = document.createElement("div");
+    msgboubleline.className = "msgboubleline";
+    var msgbouble = document.createElement("div");
+    msgbouble.className = "msgbouble";
+    msgbouble.innerHTML = strFormpt(cfg['content'], 1000);
     msgboubleline.appendChild(msgbouble);
     newline.appendChild(msgboubleline);
     return newline;
+}
+function viewNewMsg(cfg) {
+    var newline = createNewMsg(cfg);
+    chatBody.appendChild(newline);
+}
+function getInputMsg() {
+    var msg = chatInput.value;
+    chatInput.value = "";
+    return msg;
 }
