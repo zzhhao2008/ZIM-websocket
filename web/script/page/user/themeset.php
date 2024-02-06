@@ -12,6 +12,7 @@ view::header("主题设置");
         <option value="light">亮色（默认）</option>
         <option value="dark">夜晚</option>
         <option value="dai">黛</option>
+        <option value="hoto">HOTO山水</option>
     </select>
     编辑器主题：<input name="eid" value="tomorrow">
     <input  class="btn btn-primary" value="提交" type="submit">

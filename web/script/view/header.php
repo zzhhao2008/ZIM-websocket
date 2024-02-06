@@ -22,10 +22,10 @@
 <script src="http://116.62.220.226/static/js/chart.js"></script>
 <script src="/static/js/view/chart-require.js"></script>
 <?php
-if(user::read()['username']){
+if(user::read()['name']){
     echo '<script src="/static/js/msg/client.js"></script>
 <script src="/static/js/msg/view.js"></script>';
-    echo "<script>var userid=`"+user::read()['username']+"`</script>";
+    echo "<script>var userid=`".user::read()['name']."`</script>";
 }
 ;
 
