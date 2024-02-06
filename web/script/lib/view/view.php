@@ -247,7 +247,6 @@ body{
     color: $frontcolor;
     background:none;
     padding-left:60px;
-    overflow:hidden;
 }
 body::before{
     content: "";

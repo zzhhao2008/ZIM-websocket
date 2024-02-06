@@ -1,22 +1,147 @@
-/*对于宽度小于768px的设备*/
-@media screen and (max-width: 768px) {
+/*对于宽度小于620px的设备*/
+@media screen and (max-width: 620px) {
     .msg-menu {
         width: 100%;
         height: 100vh;
     }
+
+    .ChatWindow {
+        display: none;
+    }
+
+    .menu-show {
+        display: block;
+    }
+
+    .ChatWindow-show {
+        display: block;
+    }
+
+    .menu-notshow {
+        display: none;
+    }
+
+    .ChatWindow-notshow {
+        display: none;
+    }
+
+    .ChatWindow {
+        width: calc(100%);
+        background: var(--subbackcolor);
+    }
+
+    .closeWindow {
+        display: block;
+        float: left;
+        border: none;
+        background: none;
+    }
+
+    .chatWindow-inputarea {
+        height: 60px;
+        border-top: 1px solid var(--subbackcolor);
+        position: fixed;
+        bottom: 0;
+        left: 60px;
+        right: 0;
+    }
+
+    .chatWindow-body {
+        height: calc(100vh - 50px - 60px);
+    }
+
+    .chatWindow-inputarea>.function-area {
+        height: 30px;
+    }
+
+    .chatWindow-inputarea>.send {
+        position: absolute;
+        right: 5px;
+        bottom: 10px;
+        width: 50px;
+        font-size: smaller;
+        padding: 1px 1px !important; 
+    }
+
+    #chatWindow-input {
+        position: absolute;
+        bottom: 0;
+        left: 10px;
+        right: 30px;
+        top: 30px;
+    }
 }
 
 /*对于宽度大于768px的设备*/
-@media screen and (min-width: 769px) {
+@media screen and (min-width: 621px) {
     .msg-menu {
         width: 300px;
-        height: 100vh;
+        height: 100%;
+        position: fixed;
+        left: 60px;
+    }
+
+    .main {
+        padding-left: 300px;
+    }
+
+    .ChatWindow {
+        width: calc(100%);
+        left: 300px;
+        background: var(--subbackcolor);
+    }
+
+    .closeWindow {
+        display: none;
+    }
+
+    .chatWindow-inputarea {
+        height: 200px;
+        border-top: 1px solid var(--subbackcolor);
+        position: relative;
+    }
+
+    .chatWindow-body {
+        height: calc(100vh - 50px - 200px);
+    }
+
+    .chatWindow-inputarea>.function-area {
+        height: 30px;
+    }
+
+    .chatWindow-inputarea>.send {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    #chatWindow-input {
+        position: absolute;
+        bottom: 0;
+        left: 10px;
+        right: 10px;
+        top: 30px;
     }
 }
 
 .msg-menu,
 .msg-menu>.headbar {
     background: var(--subbackcolor);
+}
+
+.msg-menu-body {
+    scrollbar-width: 1px;
+    max-height: calc(100vh - 50px);
+    overflow-y: scroll;
+}
+
+.msg-menu-body::-webkit-scrollbar {
+    width: 3px;
+    background: #aaa;
+}
+
+.msg-menu-body::-webkit-scrollbar-thumb {
+    background: #555;
 }
 
 .msg-menu>.headbar {
@@ -65,6 +190,54 @@
     max-width: 50px;
 }
 
-.msg-chatmsg>.firstrow>.right,.msg-chatmsg>.firstrow>.left,.msg-chatmsg-detial {
+.msg-chatmsg>.firstrow>.right,
+.msg-chatmsg>.firstrow>.left,
+.msg-chatmsg-detial {
     overflow: hidden;
 }
+
+
+
+.ChatWindow>.headbar {
+    height: 50px;
+    line-height: 50px;
+    font-size: 17px;
+    text-align: center;
+    background: var(--subbackcolor);
+}
+
+.chatWindow-inputarea {
+    background: var(--subbackcolor);
+}
+
+.chatWindow-inputarea>.send {
+    background: var(--frontcolor);
+    color: #fff;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-radius: 5px;
+    border: none;
+}
+
+.chatWindow-inputarea>.send::hover {
+    box-shadow: inset 0 0 10px #000000;
+}
+
+.chatWindow-inputarea {
+    margin: 0;
+    padding: 0;
+}
+
+#chatWindow-input {
+    border: none;
+    background: none;
+    resize: none;
+    outline: none;
+}
+
+.chatWindow-inputarea>.function-area>*{
+    width: 30px;
+    font-size: 20px;
+    margin: 10px;
+}
+
