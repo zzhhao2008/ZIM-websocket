@@ -1,10 +1,13 @@
+var chatWindow = document.getElementById("msgWindow");
+var msgmenu=document.getElementById("msg-menu");
+var chatwindow=document.getElementById("chat-body");
 function strFormpt(str, len = 25) {
     //如果长度超出，则截断
     //如果为null，则赋值""
     //如果为undefined，则赋值""
     if (str == null) str = "";
     if (str == undefined) str = "";
-    if (str.length > len) str = str.substring(0, len);
+    if (str.length > len) str = str.substring(0, len)+"...";
     return str;
 }
 function createMsgBox(msgid, msgconfig) {
@@ -64,16 +67,35 @@ function addMsgbox(msgid, msgnew) {
 
 }
 function viewChatWindow(cfg) {
-    var chatWindow = document.getElementById("msgWindow");
     chatWindow.className = "ChatWindow ChatWindow-show";
-    var menu=document.getElementById("msg-menu");
     menu.className = "msg-menu menu-notshow";
     document.getElementById("chatWindow-name").innerHTML = strFormpt(cfg['name']);
-    
 }
 function disViewChatWindow(){
-    var chatWindow = document.getElementById("msgWindow");
     chatWindow.className = "ChatWindow ChatWindow-notshow";
-    var menu=document.getElementById("msg-menu");
     menu.className = "msg-menu menu-show";
+}
+function vcreateNewMsg(cfg){
+    /*
+    <div class="msg-line">
+            <div class="nameline">ZZH</div>
+            <div class="msgboubleline">
+                <div class="msgbouble">1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 1145145 </div>
+            </div>
+        </div>
+    */
+    var newline=document.createElement("div");
+    newline.className="msg-line";
+    var nameline=document.createElement("div");
+    nameline.className="nameline";
+    nameline.innerHTML=strFormpt(cfg['name']);
+    newline.appendChild(nameline);
+    var msgboubleline=document.createElement("div");
+    msgboubleline.className="msgboubleline";
+    var msgbouble=document.createElement("div");
+    msgbouble.className="msgbouble";
+    msgbouble.innerHTML=strFormpt(cfg['msg']);
+    msgboubleline.appendChild(msgbouble);
+    newline.appendChild(msgboubleline);
+    return newline;
 }

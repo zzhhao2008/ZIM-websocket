@@ -48,6 +48,8 @@
 
     .chatWindow-body {
         height: calc(100vh - 50px - 60px);
+        max-height:calc(100vh - 50px - 60px);
+        overflow-y: auto;
     }
 
     .chatWindow-inputarea>.function-area {
@@ -103,6 +105,7 @@
 
     .chatWindow-body {
         height: calc(100vh - 50px - 200px);
+        overflow-y: auto;
     }
 
     .chatWindow-inputarea>.function-area {
@@ -130,7 +133,7 @@
 }
 
 .msg-menu-body {
-    scrollbar-width: 1px;
+    scrollbar-width: 3px;
     max-height: calc(100vh - 50px);
     overflow-y: scroll;
 }
@@ -241,3 +244,43 @@
     margin: 10px;
 }
 
+.msg-line{
+    position: relative;
+    padding: 5px 10px;
+}
+.msg-line>.nameline{
+    height: 15px;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+.msg-line .msgbouble{
+    padding: 5px;
+    border-radius: 5px;
+    background: var(--subbackcolor);
+    width:-moz-fit-content;
+    width: fit-content;
+    
+}
+
+.msg-line-mine{
+    position: relative;
+    padding: 5px 10px;
+}
+.msg-line-mine>.nameline{
+    height: 15px;
+    font-size: 13px;
+    margin-bottom: 2px;
+    text-align: right;
+}
+.msg-line-mine .msgboubleline{
+    display: flex;
+}
+.msg-line-mine .msgbouble{
+    padding: 5px;
+    border-radius: 5px;
+    background: var(--frontcolor);
+    color: #fff;
+    width:-moz-fit-content;
+    width: fit-content;
+    margin-left: auto;
+}
