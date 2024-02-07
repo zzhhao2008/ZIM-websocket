@@ -68,12 +68,12 @@ function addMsgbox(msgid, msgnew) {
         var other = ""
         //如果msgnew.timestamp已设置
     }
-    if (msgnew.timestamp != null && msgnew.timestamp != undefined) {
-        var d = new Date(msgnew.timestamp);
+    if (msgnew.timestamp) {
+        var d = new Date(msgnew.timestamp*1000);
         hour = d.getHours();
         minute = d.getMinutes();
         //如果相隔时间超过一天就显示月+日
-        if (Math.abs(new Date().getTime() - msgnew.timestamp) > 24 * 60 * 60 * 1000) {
+        if (Math.abs(new Date().getTime()/1000 - msgnew.timestamp) > 24 * 60 * 60 * 1000) {
             other = d.getMonth() + 1 + "-" + d.getDate();
         }
         //如果超过一年就只显示年
