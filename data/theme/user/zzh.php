@@ -1,5 +1,5 @@
 <?php return array (
-  'theme' => 'hoto',
+  'theme' => 'dai',
   'selfset' => 
   array (
   ),

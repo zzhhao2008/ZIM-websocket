@@ -1,10 +1,12 @@
-chatWindow=null;
-msgmenu=null;
-function viewinit(){
+chatWindow = null;
+msgmenu = null;
+function viewinit() {
     chatWindow = document.getElementById("msgWindow");
     msgmenu = document.getElementById("msg-menu");
     chatBody = document.getElementById("chat-body");
     chatInput = document.getElementById("chatWindow-input");
+    friendlist = document.getElementById("friend-list");
+    viewedmsglist={}
 }
 
 function strFormpt(str, len = 25) {
@@ -72,19 +74,19 @@ function addMsgbox(msgid, msgnew) {
     }
 
 }
-function viewChatWindow(id,cfg) {
+function viewChatWindow(id, cfg) {
     chatWindow.className = "ChatWindow ChatWindow-show";
     msgmenu.className = "msg-menu menu-notshow";
     document.getElementById("chatWindow-name").innerHTML = strFormpt(cfg['name']);
     chatInput.focus();
-    document.getElementById("Chatmsg-" +id).className += " active";
-    if(nowChatingId!=-1)
-    document.getElementById("Chatmsg-" +nowChatingId).className = "msg-chatmsg";
+    document.getElementById("Chatmsg-" + id).className += " active";
+    if (nowChatingId != -1)
+        document.getElementById("Chatmsg-" + nowChatingId).className = "msg-chatmsg";
 }
 function disViewChatWindow(id) {
     chatWindow.className = "ChatWindow ChatWindow-notshow";
     msgmenu.className = "msg-menu menu-show";
-    document.getElementById("Chatmsg-" +id).className = "msg-chatmsg"
+    document.getElementById("Chatmsg-" + id).className = "msg-chatmsg"
 }
 function createNewMsg(cfg) {
     /*
@@ -97,7 +99,7 @@ function createNewMsg(cfg) {
     */
     var newline = document.createElement("div");
     newline.className = "msg-line";
-    if(cfg['id']===userid){
+    if (cfg['id'] === userid) {
         newline.className = " msg-line-mine";
     }
     var nameline = document.createElement("div");
@@ -121,4 +123,71 @@ function getInputMsg() {
     var msg = chatInput.value;
     chatInput.value = "";
     return msg;
+}
+function createFriend(cfg) {
+    var newitem = document.createElement("div");
+    newitem.className = "msg-menu-item";
+    var nameline = document.createElement("div");
+    nameline.className = "friendnameline";
+    var left = document.createElement("div");
+    left.className = "left";
+    left.innerHTML = strFormpt(cfg['name']);
+    var right = document.createElement("div");
+    right.className = "right";
+    if (cfg['online']) {
+        right.innerHTML = "在线";
+        right.className += " text-success";
+    } else {
+        right.innerHTML = "离线";
+        right.className += " text-danger";
+    }
+    nameline.appendChild(left);
+    nameline.appendChild(right);
+    newitem.appendChild(nameline);
+    var controlline = document.createElement("div");
+    controlline.className = "friendcontrolline";
+    delbtn = document.createElement("button");
+    if (cfg['addable']) {
+        delbtn.className += "btn-danger";
+        delbtn.innerHTML = "添加";
+    } else {
+        delbtn.className += "btn-danger";
+        delbtn.innerHTML = "删除";
+    }
+
+    delbtn.onclick = function () {
+        delFriend(cfg['id']);
+    }
+    controlline.appendChild(delbtn);
+    newitem.appendChild(controlline);
+    return newitem;
+}
+function viewnewfriend(cfg) {
+    friendlist.appendChild(createFriend(cfg));
+}
+function reviewAllFirends(listdata) {
+    if (friendlist == null) return 0;
+    //清空列表
+    friendlist.innerHTML = "";
+    for (i in listdata) {
+        if (listdata[i] == undefined) {
+            continue;
+        }
+        viewnewfriend(listdata[i]);
+    }
+    return 1;
+}
+function reviewMsgList(listdata){
+    if(msglist==null)return 0;
+    var msgbox = document.getElementById("msgbox");
+    if (msgbox == null) {
+        return 0;
+    }
+    for(i in listdata){
+        if(listdata[i]==undefined){
+            continue;
+        }
+        addMsgbox(listdata[i]['id'],listdata[i]['cfg']);
+        viewedmsglist[listdata['id']]=listdata[i]
+    }
 }
