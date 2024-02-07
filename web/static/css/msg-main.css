@@ -282,7 +282,8 @@
     background: var(--subbackcolor);
     width:-moz-fit-content;
     width: fit-content;
-    
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .msg-line-mine{
@@ -306,4 +307,6 @@
     width:-moz-fit-content;
     width: fit-content;
     margin-left: auto;
+    word-wrap: break-word;
+    word-break: break-all;
 }
