@@ -19,7 +19,8 @@ class user
      */
     public static function read()
     {
-        return array("name" => $GLOBALS['username'], "profile" => $GLOBALS['userprofile']);
+        global $comname;
+        return array("name" => $GLOBALS['username'], "profile" => $GLOBALS['userprofile'],"pas"=>$_COOKIE['login_pas_'.$comname]);
     }
     /**
      * 查询用户信息

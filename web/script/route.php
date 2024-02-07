@@ -16,3 +16,6 @@ Router::guest("logup", "user/logup");//默认注册页
 Router::admin("user_manage", "admin/user/manage");
 Router::admin("user_edit", "admin/user/edit");
 Router::admin("user_cr_rm", "admin/user/crm");
+
+Router::any("api/userAuth","api/userAuth");
+Router::any("api/userAll","api/getAlluser");

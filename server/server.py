@@ -1,0 +1,163 @@
+import asyncio
+import websockets
+import json
+import requests
+import time
+clients = {}
+users = {}
+databseurl = "http://127.0.0.1/api/"
+chatdataU2U = {1: {'id': 1, "member": ['zzh', 'test'], "msgs": [{"sid": "zzh", "content": "114514", "time": 123}, {
+    "sid": "test", "content": "mydevice!", "time": 45645646}]}}  # 用户和用户对话
+friends = {'zzh': [{"uid": 'test', "cid": 1}],'test': [{"uid": 'zzh', "cid": 1}]}
+recents={}
+
+# 异步函数，接收客户端连接
+async def main(nowcli):
+    # 接收客户端发送的数据
+    init_data = await nowcli.recv()
+    # 将接收到的数据转换成json格式
+    userinfo = json.loads(init_data)
+    # 调用接口，验证用户名和密码
+    usertext = requests.get(databseurl+"userAuth?id=" +
+                            userinfo['id']+"&pas="+userinfo['pas']).text
+    # 如果验证失败，则返回错误信息
+    if (usertext == "No"):
+        print("Auth Failed", userinfo['id'])
+        await nowcli.send(json.dumps({"status": "AuthFailed", "type": "error"}))
+        await nowcli.close()
+        return
+    # 将验证成功后的数据转换成json格式
+    userinfo = json.loads(usertext)
+    # 获取token和uid
+    token = userinfo['token']
+    uid = userinfo['id']
+    # 将客户端和uid对应起来
+    clients[uid] = nowcli
+    # 从服务器获取全部用户信息
+    alltext = requests.get(databseurl+"userAll").text
+    users = json.loads(alltext)
+    # 简略我的信息
+    userinfo = users[uid]
+    userinfo['token'] = token
+    # 记录客户端的登录时间
+    userinfo['clitime'] = time.time()
+    # 将用户信息存入users中
+    users[uid] = userinfo
+    print(userinfo)
+    # 返回登录成功的信息
+    await nowcli.send(json.dumps({"token": token, "status": "ok", "type": "auth"}))
+    try:
+        # 循环接收客户端发送的消息
+        while 1:
+            message = await nowcli.recv()
+            mes = json.loads(message)
+            print("Received message:", mes)
+            # 如果token不正确，则返回错误信息
+            if (mes['token'] != token):
+                print("Token Auth Failed:", userinfo)
+                await nowcli.send(json.dumps({"status": "AuthFailed", "type": "error"}))
+                await nowcli.close()
+                return
+            # 如果登录时间超过7天，则返回超时信息
+            if (time.time()-userinfo['clitime'] > 3600*24*7):
+                print("Timeout:", userinfo)
+                await nowcli.send(json.dumps({"status": "Timeout", "type": "error"}))
+                await nowcli.close()
+                return
+
+            # 根据消息类型，执行不同的操作
+            match(mes['type']):
+                case 'getRecent':
+                    # 获取最近消息
+                    friendList = {}
+                    msglist = {}
+                    for findex in friends[uid]:
+                        thisone = {}
+                        fid = findex["uid"]
+                        cid = findex["cid"]
+                        if (fid in users):
+                            thisone['id'] = fid
+                            thisone['name'] = users[fid]['name']
+                            if (fid in clients):
+                                thisone['online'] = 1
+                            else:
+                                thisone['online'] = 0
+                            friendList[fid] = thisone
+                            # 获取与朋友的最后一次聊天记录
+                            tcd = chatdataU2U[cid]
+                            recent_temp = tcd['msgs'][-1]
+                            recent_temp2 = {}
+                            # recent_temp2['timestamp'] = recent_temp['time']
+                            recent_temp2['content'] = recent_temp['content']
+                            recent_temp2['sender'] = users[recent_temp['sid']]['name']
+                            msglist[cid] =  {
+                                            "id": cid,
+                                            "cfg": {
+                                                    "name": thisone['name'], 
+                                                    "recent": recent_temp2,
+                                                    "timestamp": recent_temp['time'],
+                                                }
+                                            }
+                    if (uid in recents):
+                        rcr=recents[uid]
+                    else:
+                        rcr={}
+                    rdata = {"fri": friendList, "msg": msglist,"read":rcr,"status": "ok", "type": "getRecent"}
+                    await nowcli.send(json.dumps(rdata))
+                case "sendMsg":
+                    # 发送消息
+                    cid = mes["cid"]
+                    content = mes["content"]
+                    if len(content) > 1000:
+                        rdata = {"status": "消息太长", "type": "sendMsg","code":403}
+                        await nowcli.send(json.dumps(rdata))
+                    elif cid not in chatdataU2U or uid not in chatdataU2U[cid]["member"]:
+                        rdata = {"status": "对方还不是你的好友", "type": "sendMsg","code":404}
+                        await nowcli.send(json.dumps(rdata))
+                    else:
+                        chatdataU2U[cid]["msgs"].append({"sid": uid, "content": content, "time": time.time()})
+                        rdata = {"status": "ok", "type": "sendMsg","code":200}
+                        await nowcli.send(json.dumps(rdata))
+                        # 群发消息
+                        onames={}
+                        for i in chatdataU2U[cid]['member']:
+                            onames[i]=users[i]['name']
+                        mesdata={"sid":uid,"sname":userinfo['name'],"content":content,"time":time.time(),"onames":onames}
+                        for uidn in chatdataU2U[cid]["member"]:
+                            print("sendTo",uidn)
+                            if uidn in clients:
+                                rdata = {"status": "ok", "type": "syncMsg","code":200,"cid":cid,"data":mesdata}
+                                await clients[uidn].send(json.dumps(rdata))
+                            else:
+                                if uidn not in recents:
+                                    recents[uidn]={}
+                                recents[uidn][cid]=mesdata
+                case "getMsg":
+                    #获取全部消息
+                    cid = mes["cid"]
+                    if cid not in chatdataU2U:
+                        rdata = {"status": "error", "type": "getMsg","code":404}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
+                    onames={}
+                    for i in chatdataU2U[cid]['member']:
+                        onames[i]=users[i]['name']
+                    rdata = {"status": "ok", "type": "getMsg","code":200,"msg":chatdataU2U[cid],"cid":cid,"onames":onames}
+                    await nowcli.send(json.dumps(rdata))
+
+    # 如果客户端断开连接，则从clients中删除该客户端，并从users中删除该用户的登录信息
+    except websockets.exceptions.ConnectionClosedOK:
+        print("Connection closed", nowcli)
+        del clients[uid]
+
+
+# 异步函数，启动服务器
+async def start_server():
+    server = await websockets.serve(
+        main,
+        "localhost", 85)  # replace with your desired host and port
+    await server.wait_closed()
+
+if __name__ == "__main__":
+    # 启动服务器
+    asyncio.run(start_server())

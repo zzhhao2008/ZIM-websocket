@@ -83,6 +83,13 @@
 
 /*对于宽度大于768px的设备*/
 @media screen and (min-width: 621px) {
+    .messagebox{
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 9999;
+    }
+
     .msg-menu {
         width: 300px;
         height: 100%;
@@ -137,6 +144,7 @@
 .msg-menu,
 .msg-menu>.headbar {
     background: var(--subbackcolor);
+    border-right:1px solid var(--subbackcolor);
 }
 
 .msg-menu-body {

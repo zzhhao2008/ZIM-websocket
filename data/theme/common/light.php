@@ -6,5 +6,5 @@ return array(
     'activecolor'=>'#FFFF00',
     "barcolor"=>"#DDDDDD",
     "barfcolor"=>"rgb(35,35,35)",
-    "subbackcolor"=>"rgba(225, 225, 225, 0.55)"
+    "subbackcolor"=>"rgba(205, 205, 205, 0.55)"
 );

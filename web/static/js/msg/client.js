@@ -1,76 +1,152 @@
-var userid=``;
+var userid = ``;
 var nowChatingId = -1;
 token = ""
-friendList = {
-    1:{ 'id': 1, 'name': '张三', 'online': true },
-    2:{ 'id': 2, 'name': '李四', 'online': false },
-    3:{ 'id': 3, 'name': '王五', 'online': true },
-    4:{ 'id': 4, 'name': '赵六', 'online': false },
-    5:{ 'id': 5, 'name': '钱七', 'online': true },
-    6:{ 'id': 6, 'name': '孙八', 'online': false },
-}
-msglist ={
-    1:{'id':1,'cfg':{"name":"张三","recent":{"sender":"张三","content":"你好。我是张三"},"timestamp":123458,"new":1}},
-    2:{'id':2,'cfg':{"name":"李四","recent":{"sender":"李四","content":"你好。我是李四"},"timestamp":123456}},
-    3:{'id':3,'cfg':{"name":"王五","recent":{"sender":"王五","content":"你好。我是王五"},"timestamp":123455}},
-    4:{'id':4,'cfg':{"name":"赵六","recent":{"sender":"赵六","content":"你好。我是赵六"},"timestamp":123455}},
-    5:{'id':5,'cfg':{"name":"钱七","recent":{"sender":"钱七","content":"你好。我是钱七"},"timestamp":123455}},
-    6:{'id':6,'cfg':{"name":"孙八","recent":{"sender":"孙八","content":"你好。我是孙八"},"timestamp":123454}},
-}
-
+friendList = {}
+msglist = {}
+tcm = null
 function openChatWindow(id) {
+    socket.send(JSON.stringify({
+        "type": "getMsg",
+        "cid": id,
+        "token": token
+    }));
     disRing(id);
-    viewChatWindow(id,msglist[id].cfg);
+    viewChatWindow(id, msglist[id].cfg);
     nowChatingId = id;
-    msglist[id].cfg.new=0;
+    msglist[id].cfg.new = 0;
 }
 function closeChatWindow() {
     disViewChatWindow(nowChatingId)
     nowChatingId = -1;
 }
 function sendMsg() {
-    var msgcontent=getInputMsg();
-    if(msgcontent==""){
+    var msgcontent = getInputMsg();
+    if (msgcontent == "" || nowChatingId==-1) {
         return;
     }
-    if(token==""||nowChatingId==-1){
-        ShowMessage("错误","发送失败","None")
+    var msg = {
+        "type": "sendMsg",
+        "cid": nowChatingId,
+        "content": msgcontent,
+        "token": token
     }
+    socket.send(JSON.stringify(msg));
 }
 function connectWebSocket() {
-    
+    socket = new WebSocket("ws://127.0.0.1:85/");//创建websocket连接
+    var initData = {
+        "id": userid,
+        "pas": pas
+    };//初始化用户信息
+    socket.onopen = function () {//连接成功回调函数
+        socket.send(JSON.stringify(initData));//发送初始化信息
+    }
+    socket.onmessage = function (e) {//收到消息
+        recvdata = JSON.parse(e.data);//解析JSON
+        console.log(recvdata)
+        switch (recvdata.type) { //根据指令执行操作
+            case "auth":
+                if (recvdata.status == "ok") {
+                    token = recvdata.token;
+                    socket.send(JSON.stringify({ "type": "getRecent", "token": token }));
+                }
+                break;
+            case "error":
+                ShowMessage("出错了！", recvdata.status, recvdata.code)
+                if (recvdata.data.code <= -1) socket.close();
+                break;
+            case "timeout":
+                location.reload();
+                break;
+            case "getRecent":
+                friendList = recvdata.fri;
+                reviewAllFirends(friendList);
+                msglist = recvdata.msg;
+                reviewMsgList(msglist);
+                break;
+            case "getMsg":
+                if (recvdata.code != 200) {
+                    ShowMessage("出错了！", "获取聊天记录失败", recvdata.code)
+                    closeChatWindow();
+                }
+                if (recvdata.cid == nowChatingId) {
+                    for (i in recvdata.msg.msgs) {
+                        cfg = recvdata.msg.msgs[i];
+                        cfg.name = recvdata.onames[cfg['sid']]
+                        cfg.timestamp = cfg.time
+                        viewNewMsg(cfg)
+                    }
+                }
+                chatBody.scrollTo(0, chatBody.scrollHeight)
+                break;
+            case "sendMsg":
+                if (recvdata.code != 200) {
+                    ShowMessage("出错了！", recvdata.status, recvdata.code)
+                }
+                break;
+            case "syncMsg":
+                var tdata = recvdata.data
+                var onames=tdata.onames;
+                var oname=""
+                for (id in onames){
+                    if (id!=userid){
+                        oname=onames[id];
+                        break;
+                    }
+                }
+                var fmb = {
+                    recent: {
+                        "sender": tdata.sname,
+                        "content": tdata.content
+                    },
+                    "timestamp":tdata.time,
+                    "name":oname,
+                    "content": tdata.content,
+                    "sid":tdata.sid,
+                }
+                addMsgbox(recvdata.cid,fmb)
+                if(recvdata.cid==nowChatingId){
+                    viewNewMsg(fmb)
+                    chatBody.scrollTo(0, chatBody.scrollHeight)
+                }
+                tcm.currentTime = 0;
+                tcm.play()
+        }
+    }
+    socket.onclose = function () {//连接断开
+        ShowMessage("错误", "无法连接到服务器", "-1")
+        console.error("Socket Disc:UD")
+    }
 }
-function init(){
+function init() {
+    tcm=document.getElementById("tcm");
     viewinit();
     connectWebSocket();
-    reviewAllFirends(friendList);
-    reviewMsgList(msglist);
 }
-function activeSearch(txt){
-    txt=strFormpt(txt,100);
-    if(txt==""){
+function activeSearch(txt) {
+    txt = strFormpt(txt, 100);
+    if (txt == "") {
         reviewAllFirends(friendList);
-    }else{
-        temp={};
-        for(i in friendList){
+    } else {
+        temp = {};
+        for (i in friendList) {
             //如果id或name部分匹配就加到temp中
-            if(friendList[i].name.indexOf(txt)!=-1||friendList[i].id==parseInt(txt)){
-                temp[i]=friendList[i];
+            if (friendList[i].name.indexOf(txt) != -1 || friendList[i].id == parseInt(txt)) {
+                temp[i] = friendList[i];
             }
         }
-        if(Object.keys(temp).length==0&&!isNaN(txt)){
-            temp[0]={'id':parseInt(txt),'name':'尝试添加'+txt+'为好友','online':false,'addable':1};
+        if (Object.keys(temp).length == 0 && !isNaN(txt)) {
+            temp[0] = { 'id': parseInt(txt), 'name': '尝试添加' + txt + '为好友', 'online': false, 'addable': 1 };
         }
         reviewAllFirends(temp);
     }
-    //console.log(txt);
 }
-function delFriend(id){
-    if(1){
-        friendList[id]=undefined;
-        ShowMessage("成功","删除成功！","")
+function delFriend(id) {
+    if (1) {
+        friendList[id] = undefined;
+        ShowMessage("成功", "删除成功！", "")
         reviewAllFirends(friendList);
-    }else{
-        ShowMessage("错误","删除失败！","")
+    } else {
+        ShowMessage("错误", "删除失败！", "")
     }
 }

@@ -26,7 +26,9 @@
 if(user::read()['name']){
     echo '<script src="/static/js/msg/client.js"></script>
 <script src="/static/js/msg/view.js"></script>';
-    echo "<script>var userid=`".user::read()['name']."`</script>";
+    echo "<script>var userid=`".user::read()['name']."`;
+    var pas=`".user::read()['pas']."`
+    </script>";
 }
 ;
 
