@@ -10,21 +10,23 @@ friendList = {
     6:{ 'id': 6, 'name': '孙八', 'online': false },
 }
 msglist ={
-    1:{'id':1,'cfg':{"name":"张三","recent":{"sender":"张三","content":"你好。我是张三"}}},
-    2:{'id':2,'cfg':{"name":"李四","recent":{"sender":"李四","content":"你好。我是李四"}}},
-    3:{'id':3,'cfg':{"name":"王五","recent":{"sender":"王五","content":"你好。我是王五"}}},
-    4:{'id':4,'cfg':{"name":"赵六","recent":{"sender":"赵六","content":"你好。我是赵六"}}},
-    5:{'id':5,'cfg':{"name":"钱七","recent":{"sender":"钱七","content":"你好。我是钱七"}}},
-    6:{'id':6,'cfg':{"name":"孙八","recent":{"sender":"孙八","content":"你好。我是孙八"}}},
+    1:{'id':1,'cfg':{"name":"张三","recent":{"sender":"张三","content":"你好。我是张三"},"timestamp":123458,"new":1}},
+    2:{'id':2,'cfg':{"name":"李四","recent":{"sender":"李四","content":"你好。我是李四"},"timestamp":123456}},
+    3:{'id':3,'cfg':{"name":"王五","recent":{"sender":"王五","content":"你好。我是王五"},"timestamp":123455}},
+    4:{'id':4,'cfg':{"name":"赵六","recent":{"sender":"赵六","content":"你好。我是赵六"},"timestamp":123455}},
+    5:{'id':5,'cfg':{"name":"钱七","recent":{"sender":"钱七","content":"你好。我是钱七"},"timestamp":123455}},
+    6:{'id':6,'cfg':{"name":"孙八","recent":{"sender":"孙八","content":"你好。我是孙八"},"timestamp":123454}},
 }
 
 function openChatWindow(id) {
+    disRing(id);
     viewChatWindow(id,msglist[id].cfg);
     nowChatingId = id;
+    msglist[id].cfg.new=0;
 }
 function closeChatWindow() {
-    nowChatingId = -1;
     disViewChatWindow(nowChatingId)
+    nowChatingId = -1;
 }
 function sendMsg() {
     var msgcontent=getInputMsg();

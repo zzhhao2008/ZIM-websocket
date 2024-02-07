@@ -1,5 +1,12 @@
 /*对于宽度小于620px的设备*/
 @media screen and (max-width: 620px) {
+    .messagebox{
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        z-index: 9999;
+    }
+
     .msg-menu {
         width: 100%;
         height: 100vh;
@@ -170,6 +177,10 @@
     padding: 2px;
     padding-top: 5px;
     padding-bottom: 5px;
+}
+
+.msg-chatmsg-ring {
+    border: 2px outset red;
 }
 
 .msg-chatmsg>firstrow {

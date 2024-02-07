@@ -95,10 +95,10 @@ class view
     {
         global $viewimport;
         if ($viewimport['messagebox']) {
-            echo "<div class=\"toast-container right-pos\" id='messageboxbox'>" . $viewimport['messagebox'] . "</div>";
+            echo "<div class=\"toast-container messagebox\" id='messageboxbox'>" . $viewimport['messagebox'] . "</div>";
             $viewimport['messagebox'] = "";
         } else {
-            echo "<div class=\"toast-container right-pos\" id='messageboxbox'></div>";
+            echo "<div class=\"toast-container messagebox\" id='messageboxbox'></div>";
         }
         if ($viewimport['alert']) {
             echo "<div class=\"top-pos\" id='alertboxbox'>" . $viewimport['alert'] . "</div>";

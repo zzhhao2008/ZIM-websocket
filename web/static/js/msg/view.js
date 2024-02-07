@@ -29,6 +29,9 @@ function createMsgBox(msgid, msgconfig) {
     msgbox.onclick = function () { openChatWindow(msgid); }
 
     msgbox.className = "msg-chatmsg";
+    if(msgconfig['new']){
+        msgbox.className += " msg-chatmsg-ring";
+    }
     var firstrow = document.createElement("div");
     firstrow.className = "firstrow";
     var left = document.createElement("span");
@@ -54,8 +57,23 @@ function createMsgBox(msgid, msgconfig) {
 function addMsgbox(msgid, msgnew) {
     if (msgnew.time == null || msgnew.time == undefined) {
         //赋值当前时分
-        hour = new Date().getHours();
-        minute = new Date().getMinutes();
+        var hour = new Date().getHours();
+        var minute = new Date().getMinutes();
+        var other=""
+        //如果msgnew.timestamp已设置
+        if (msgnew.timestamp != null && msgnew.timestamp != undefined) {
+            var d = new Date(msgnew.timestamp);
+            hour = d.getHours();
+            minute = d.getMinutes();
+            //如果相隔时间超过一天就显示月+日
+            if (Math.abs(new Date().getTime() - msgnew.timestamp) > 24 * 60 * 60 * 1000) {
+                other = d.getMonth() + 1 + "-" + d.getDate();
+            }
+            //如果超过一年就只显示年
+            if (Math.abs(new Date().getFullYear() - d.getFullYear()) > 1) {
+                other = d.getFullYear();
+            }
+        }
         //自动补零
         if (hour < 10) {
             hour = "0" + hour;
@@ -64,6 +82,9 @@ function addMsgbox(msgid, msgnew) {
             minute = "0" + minute;
         }
         msgnew.time = hour + ":" + minute;
+        if(other!=""){
+            msgnew.time=other;
+        }
     }
     var newmsgbox = createMsgBox(msgid, msgnew);
     var msgbox = document.getElementById("msgbox");
@@ -84,6 +105,7 @@ function viewChatWindow(id, cfg) {
         document.getElementById("Chatmsg-" + nowChatingId).className = "msg-chatmsg";
 }
 function disViewChatWindow(id) {
+    console.log("disViewChatWindow",id);
     chatWindow.className = "ChatWindow ChatWindow-notshow";
     msgmenu.className = "msg-menu menu-show";
     document.getElementById("Chatmsg-" + id).className = "msg-chatmsg"
@@ -122,6 +144,7 @@ function viewNewMsg(cfg) {
 function getInputMsg() {
     var msg = chatInput.value;
     chatInput.value = "";
+    chatInput.focus();
     return msg;
 }
 function createFriend(cfg) {
@@ -177,8 +200,28 @@ function reviewAllFirends(listdata) {
     }
     return 1;
 }
-function reviewMsgList(listdata){
-    if(msglist==null)return 0;
+function reviewMsgList(inlistdata){
+    var listdata = JSON.parse(JSON.stringify(inlistdata)); // 创建对象副本
+    if(listdata==null)return 0;
+    //将listdata按照cfg.timestamp降序排序
+    for(i in listdata){
+        if(listdata[i]==undefined){
+            continue;
+        }
+        listdata[i]['cfg']['timestamp'] = parseInt(listdata[i]['cfg']['timestamp']);
+        for(j in listdata)
+        {
+            if(listdata[j]==undefined||i==j){
+                continue;
+            }
+            listdata[j]['cfg']['timestamp'] = parseInt(listdata[j]['cfg']['timestamp']);
+            if(listdata[i]['cfg']['timestamp']<listdata[j]['cfg']['timestamp']){
+                var temp = listdata[i];
+                listdata[i] = listdata[j];
+                listdata[j] = temp;
+            }
+        }
+    }
     var msgbox = document.getElementById("msgbox");
     if (msgbox == null) {
         return 0;
@@ -190,4 +233,7 @@ function reviewMsgList(listdata){
         addMsgbox(listdata[i]['id'],listdata[i]['cfg']);
         viewedmsglist[listdata['id']]=listdata[i]
     }
+}
+function disRing(id){
+    document.getElementById("Chatmsg-" + id).className = "msg-chatmsg";
 }
