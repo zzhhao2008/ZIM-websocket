@@ -20,7 +20,7 @@
 <script src="/static/js/ace/aceinit.js"></script>
 <script src='/static/js/md/markedjs.js'></script>
 <script>import('/static/js/md/mathtex.js');</script>
-<script src="http://116.62.220.226/static/js/chart.js"></script>
+<script src="https://class.zsvstudio.top/static/js/chart.js"></script>
 <script src="/static/js/view/chart-require.js"></script>
 <?php
 if(user::LoginCheck()){

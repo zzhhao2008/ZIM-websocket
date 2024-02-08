@@ -4,6 +4,7 @@ import json
 import requests
 import time
 import datacommd as db
+import glm3 as ai
 clients = {}
 users = {}
 databseurl = "https://chat.zsvstudio.top/api/"
@@ -53,6 +54,7 @@ async def main(nowcli):
     if uid not in friends:
         friends[uid] = []
     await nowcli.send(json.dumps({"token": token, "status": "ok", "type": "auth"}))
+    myaimes=[]
     try:
         # 循环接收客户端发送的消息
         while 1:
@@ -105,8 +107,23 @@ async def main(nowcli):
                                                     "timestamp": recent_temp['time'],
                                                 }
                                             }
+                    # 将AI对话记录插入
+                    msglist['ai'] = {
+                        "id": "ai",
+                        "cfg": {
+                            "name":"AI小助手",
+                            "recent": {
+                                "content": "欢迎使用AI小助手",
+                                "sender": "AI小助手",
+                                'timestamp': time.time()
+                            }
+                        }
+                    }
+
                     if (uid in recents):
                         rcr=recents[uid]
+                        recents['uid']={}
+                        db.write_data(recents,"recents")
                     else:
                         rcr={}
                     rdata = {"fri": friendList, "msg": msglist,"read":rcr,"status": "ok", "type": "getRecent"}
@@ -144,6 +161,17 @@ async def main(nowcli):
                 case "getMsg":
                     #获取全部消息
                     cid = mes["cid"]
+                    if cid == "ai":
+                        onames={uid:userinfo['name'],"ai":'AI小助手'}
+                        msgb=[]
+                        for hist in myaimes:
+                            sid="ai"
+                            if hist['role']=='user':
+                                sid=uid
+                            msgb.append({"sid":sid,"content":hist['content'],"time":time.time()})
+                        rdata = {"status": "ok", "type": "getMsg","code":200,"msg":{"msgs":msgb,"member":[uid,"ai"]},"cid":cid,"onames":onames}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
                     if cid not in chatdataU2U:
                         rdata = {"status": "error", "type": "getMsg","code":404}
                         await nowcli.send(json.dumps(rdata))
@@ -191,7 +219,7 @@ async def main(nowcli):
                         await nowcli.send(json.dumps(rdata))
                         continue
                     #如果对方的好友数量超过300个
-                    if len(friends[fid])>=300:
+                    if fid in friends and len(friends[fid])>=300 or fid=="ai" :
                         rdata={"status":"对方的好友数量已达上限","type":"addFriend","code":403}
                         await nowcli.send(json.dumps(rdata))
                         continue
@@ -207,6 +235,8 @@ async def main(nowcli):
                         myinfo={"uid":fid,"cid":cid,"time":time.time()}
                         friends[uid].append(myinfo)
                         finfo={"uid":uid,"cid":cid,"time":time.time()}
+                        if fid not in friends:
+                            friends[fid]=[]
                         friends[fid].append(finfo)
                         #{'id': 1, "member": ['zzh', 'test'], "msgs": [{"sid": "zzh", "content": "114514", "time": 123}}
                         msginfo={'id':cid,"member":[uid,fid],"msgs":[{"sid":uid,"content":"我已成功添加你为好友！","time":time.time()}]}
@@ -217,7 +247,11 @@ async def main(nowcli):
                         if fid in clients:
                             await clients[fid].send(json.dumps(rdata))
                         db.write_data(friends,"friends")
-            
+                case "ai":
+                    newmess=mes['content']
+                    this,myaimes=ai.quest(myaimes,newmess)
+                    rdata={"status":"ai回答","type":"ai","code":200,"content":this}
+                    await nowcli.send(json.dumps(rdata))
             #把数据保存
             db.write_data(chatdataU2U,"chatdataU2U")
     # 如果客户端断开连接，则从clients中删除该客户端，并从users中删除该用户的登录信息

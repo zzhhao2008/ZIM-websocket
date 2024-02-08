@@ -24,6 +24,15 @@ function sendMsg() {
     if (msgcontent == "" || nowChatingId==-1) {
         return;
     }
+    if(nowChatingId=="ai"){
+        var msg = {
+            "type": "ai",
+            "content": msgcontent,
+            "token": token
+        }
+        socket.send(JSON.stringify(msg));
+        return;
+    }
     var msg = {
         "type": "sendMsg",
         "cid": nowChatingId,
@@ -33,7 +42,7 @@ function sendMsg() {
     socket.send(JSON.stringify(msg));
 }
 function connectWebSocket() {
-    socket = new WebSocket("ws://127.0.0.1:85/");//创建websocket连接
+    socket = new WebSocket("wss://chat.zsvstudio.top:85/");//创建websocket连接
     var initData = {
         "id": userid,
         "pas": pas
@@ -63,6 +72,11 @@ function connectWebSocket() {
                 reviewAllFirends(friendList);
                 msglist = recvdata.msg;
                 reviewMsgList(msglist);
+                if(recvdata.read){
+                    for(i in recvdata.read) {
+                        ring(i)
+                    }
+                }
                 break;
             case "getMsg":
                 if (recvdata.code != 200) {
@@ -122,6 +136,11 @@ function connectWebSocket() {
             case "addFriend":
                 ShowMessage("好友已添加", recvdata.status, recvdata.code)
                 socket.send(JSON.stringify({ "type": "getRecent", "token": token }));
+                break;
+            case "ai":
+                if (nowChatingId == "ai"){
+                    openChatWindow("ai")
+                }
                 break;
         }
     }

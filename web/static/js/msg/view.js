@@ -245,3 +245,6 @@ function reviewMsgList(inlistdata) {
 function disRing(id) {
     document.getElementById("Chatmsg-" + id).className = "msg-chatmsg";
 }
+function ring(id) {
+    document.getElementById("Chatmsg-" + id).className += "msg-chatmsg-ring";
+}
