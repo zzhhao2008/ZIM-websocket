@@ -111,6 +111,18 @@ function connectWebSocket() {
                 }
                 tcm.currentTime = 0;
                 tcm.play()
+                break;
+            case "dataChanged":
+                socket.send(JSON.stringify({ "type": "getRecent", "token": token }));
+                break; 
+            case "delFriend":
+                ShowMessage("好友已被删除", recvdata.status, recvdata.code)
+                socket.send(JSON.stringify({ "type": "getRecent", "token": token }));
+                break;
+            case "addFriend":
+                ShowMessage("好友已添加", recvdata.status, recvdata.code)
+                socket.send(JSON.stringify({ "type": "getRecent", "token": token }));
+                break;
         }
     }
     socket.onclose = function () {//连接断开
@@ -131,22 +143,23 @@ function activeSearch(txt) {
         temp = {};
         for (i in friendList) {
             //如果id或name部分匹配就加到temp中
-            if (friendList[i].name.indexOf(txt) != -1 || friendList[i].id == parseInt(txt)) {
+            if (friendList[i].name.indexOf(txt) != -1 || friendList[i].id == txt) {
                 temp[i] = friendList[i];
             }
         }
-        if (Object.keys(temp).length == 0 && !isNaN(txt)) {
-            temp[0] = { 'id': parseInt(txt), 'name': '尝试添加' + txt + '为好友', 'online': false, 'addable': 1 };
+        if (Object.keys(temp).length == 0) {
+            temp[0] = { 'id': txt, 'name': '尝试添加' + txt + '为好友', 'online': false, 'addable': 1 };
         }
         reviewAllFirends(temp);
     }
 }
 function delFriend(id) {
-    if (1) {
-        friendList[id] = undefined;
-        ShowMessage("成功", "删除成功！", "")
-        reviewAllFirends(friendList);
-    } else {
-        ShowMessage("错误", "删除失败！", "")
+    if (confirm("确定删除好友？确定后您与好友的消息记录等数据都将被清空")) {
+        socket.send(JSON.stringify({ 'type': 'delFriend', 'id': id ,"token":token}));
+    }
+}
+function addFriend(id) {
+    if (confirm("确定添加好友？")) {
+        socket.send(JSON.stringify({ 'type': 'addFriend', 'id': id ,"token":token}));
     }
 }

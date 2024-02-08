@@ -69,11 +69,11 @@ function addMsgbox(msgid, msgnew) {
         //如果msgnew.timestamp已设置
     }
     if (msgnew.timestamp) {
-        var d = new Date(msgnew.timestamp*1000);
+        var d = new Date(msgnew.timestamp * 1000);
         hour = d.getHours();
         minute = d.getMinutes();
         //如果相隔时间超过一天就显示月+日
-        if (Math.abs(new Date().getTime()/1000 - msgnew.timestamp) > 24 * 60 * 60 * 1000) {
+        if (Math.abs(new Date().getTime() / 1000 - msgnew.timestamp) > 24 * 60 * 60 * 1000) {
             other = d.getMonth() + 1 + "-" + d.getDate();
         }
         //如果超过一年就只显示年
@@ -180,13 +180,15 @@ function createFriend(cfg) {
     if (cfg['addable']) {
         delbtn.className += "btn-danger";
         delbtn.innerHTML = "添加";
+        delbtn.onclick = function () {
+            addFriend(cfg['id']);
+        }
     } else {
         delbtn.className += "btn-danger";
         delbtn.innerHTML = "删除";
-    }
-
-    delbtn.onclick = function () {
-        delFriend(cfg['id']);
+        delbtn.onclick = function () {
+            delFriend(cfg['id']);
+        }
     }
     controlline.appendChild(delbtn);
     newitem.appendChild(controlline);

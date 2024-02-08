@@ -9,7 +9,8 @@ $emptycfg = array(
     'rating' => 1500,
     'email' => '',
     'about' => '',
-    'dt' => array()
+    'dt' => array(),
+    "addable"=>1
 );
 class user
 {

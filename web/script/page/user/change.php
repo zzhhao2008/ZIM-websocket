@@ -3,6 +3,7 @@ if ($_POST['nick']) {
     user::change("about", $_POST['about']);
     user::change("nick", $_POST['nick']);
     user::change("email",$_POST['email']);
+    user::change("addable",$_POST['addable']?1:0);
     if($_POST['password']){
         user::change("password",md5($_POST['password']));
     }
@@ -38,6 +39,11 @@ if ($_POST['nick']) {
                         <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea" name="about"><?= user::read()['profile']['about'] ?></textarea>
                         <label for="floatingTextarea">个人介绍</label>
                         <div id="passwordHelp" class="form-text">输入关于我的一切</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="addable" class="form-label">允许添加好友</label>
+                        <input type="checkbox" value="1" id="addable" name="addable" <?=user::read()['profile']['addable']?"checked":""?>>
+                        <div id="Help" class="form-text">可被他人添加好友</div>
                     </div>
                     <button type="submit" class="btn btn-primary">确定</button>
                 </form>

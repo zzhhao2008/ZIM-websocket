@@ -144,6 +144,68 @@ async def main(nowcli):
                         onames[i]=users[i]['name']
                     rdata = {"status": "ok", "type": "getMsg","code":200,"msg":chatdataU2U[cid],"cid":cid,"onames":onames}
                     await nowcli.send(json.dumps(rdata))
+                case "delFriend":
+                    #删除好友操作
+                    fid = mes["id"]
+                    for friendinfo in friends[uid]:
+                        if friendinfo['uid']==fid:
+                            chatdataU2U.pop(friendinfo['cid'])
+                            friends[uid].remove(friendinfo)
+                            rdata={"status":"已成功将"+fid+"从好友中移除","type":"delFriend","code":200}
+                            await nowcli.send(json.dumps(rdata))
+                            break
+                    for friendinfo in friends[fid]:
+                        if friendinfo['uid']==uid:
+                            #chatdataU2U.pop(friendinfo['cid'])
+                            friends[fid].remove(friendinfo)
+                            rdata={"status":"已被"+uid+"从好友中移除","type":"delFriend","code":200}
+                            if fid in clients:
+                                await clients[fid].send(json.dumps(rdata))
+                            break
+                case "addFriend":
+                    fid=mes["id"]
+                    alltext = requests.get(databseurl+"userAll").text
+                    users = json.loads(alltext)
+                    if fid not in users:
+                        rdata={"status":"该用户不存在","type":"addFriend","code":404}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
+                    if users[fid]['addable'] != True:
+                        rdata={"status":"该用户无法添加为好友","type":"addFriend","code":403}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
+                    #如果我的好友数量超过300个
+                    if len(friends[uid])>=300:
+                        rdata={"status":"您的好友数量已达上限","type":"addFriend","code":403}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
+                    #如果对方的好友数量超过300个
+                    if len(friends[fid])>=300:
+                        rdata={"status":"对方的好友数量已达上限","type":"addFriend","code":403}
+                        await nowcli.send(json.dumps(rdata))
+                        continue
+                    notExi=True
+                    for friendinfo in friends[uid]:
+                        if friendinfo['uid']==fid:
+                            rdata={"status":"该用户已是您的好友","type":"addFriend","code":409}
+                            await nowcli.send(json.dumps(rdata))
+                            notExi=False
+                            break
+                    if notExi :
+                        cid=len(chatdataU2U)+1
+                        myinfo={"uid":fid,"cid":cid,"time":time.time()}
+                        friends[uid].append(myinfo)
+                        finfo={"uid":uid,"cid":cid,"time":time.time()}
+                        friends[fid].append(finfo)
+                        #{'id': 1, "member": ['zzh', 'test'], "msgs": [{"sid": "zzh", "content": "114514", "time": 123}}
+                        msginfo={'id':cid,"member":[uid,fid],"msgs":[{"sid":uid,"content":"我已成功添加你为好友！","time":time.time()}]}
+                        chatdataU2U[cid]=msginfo
+                        rdata={"status":"添加成功","type":"addFriend","code":200,"cid":cid}
+                        await nowcli.send(json.dumps(rdata))
+                        rdata={"status":uid+"将你添加到好友","type":"addFriend","code":200,"cid":cid}
+                        if fid in clients:
+                            await clients[fid].send(json.dumps(rdata))
+
 
     # 如果客户端断开连接，则从clients中删除该客户端，并从users中删除该用户的登录信息
     except websockets.exceptions.ConnectionClosedOK:
