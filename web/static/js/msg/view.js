@@ -9,7 +9,7 @@ function viewinit() {
     viewedmsglist = {}
 }
 
-function strFormpt(str, len = 25) {
+function strFormpt(str, len = 20) {
     //如果长度超出，则截断
     //如果为null，则赋值""
     //如果为undefined，则赋值""

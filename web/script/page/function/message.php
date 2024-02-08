@@ -18,7 +18,7 @@
         <div class="chatWindow-inputarea">
             <div class="function-area">
                 <span><?= view::icon("emoji-smile") ?></span>
-                <span><?= view::icon("image") ?></span>
+                <span onclick="useAIChat()"><?= view::icon("robot") ?></span>
             </div>
             <textarea id="chatWindow-input" onkeydown="if(event.ctrlKey&&event.keyCode==13){sendMsg()}" maxlength="1000"></textarea>
             <button class="send" onclick="sendMsg()">发送</button>

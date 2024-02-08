@@ -62,7 +62,7 @@ async def main(nowcli):
             mes = json.loads(message)
             print("Received message:", mes)
             # 如果token不正确，则返回错误信息
-            if (mes['token'] != token):
+            if ("token" not in  mes or mes['token'] != token):
                 print("Token Auth Failed:", userinfo)
                 await nowcli.send(json.dumps({"status": "AuthFailed", "type": "error"}))
                 await nowcli.close()
@@ -73,7 +73,8 @@ async def main(nowcli):
                 await nowcli.send(json.dumps({"status": "Timeout", "type": "error"}))
                 await nowcli.close()
                 return
-
+            if("type" not in mes):
+                continue
             # 根据消息类型，执行不同的操作
             match(mes['type']):
                 case 'getRecent':
@@ -150,7 +151,7 @@ async def main(nowcli):
                         mesdata={"sid":uid,"sname":userinfo['name'],"content":content,"time":time.time(),"onames":onames}
                         for uidn in chatdataU2U[cid]["member"]:
                             print("sendTo",uidn)
-                            if uidn in clients:
+                            if uidn in clients and clients[uidn].open:
                                 rdata = {"status": "ok", "type": "syncMsg","code":200,"cid":cid,"data":mesdata}
                                 await clients[uidn].send(json.dumps(rdata))
                             else:
@@ -251,6 +252,27 @@ async def main(nowcli):
                     newmess=mes['content']
                     this,myaimes=ai.quest(myaimes,newmess)
                     rdata={"status":"ai回答","type":"ai","code":200,"content":this}
+                    await nowcli.send(json.dumps(rdata))
+                case "useAiChat":
+                    tempaimes=[]
+                    cutmes=[]
+                    cid=mes['cid']
+                    if(cid not in chatdataU2U):
+                        continue
+                    msgs=chatdataU2U[cid]['msgs']
+                    if(len(msgs)>20):
+                        #截取后20条到倒数第二条
+                        cutmes=msgs[-20:]
+                    else:
+                        cutmes=msgs
+                    for i in cutmes:
+                        role="assistant"
+                        if(i['sid']!=uid):
+                            role="user"
+                        content=i['content']
+                        tempaimes.append({"role":role,"content":content})
+                    aicontent,_t=ai.quest(tempaimes,msgs[-1]['content'])
+                    rdata={"status":"ai建议","type":"useAiChat","code":200,"content":aicontent}
                     await nowcli.send(json.dumps(rdata))
             #把数据保存
             db.write_data(chatdataU2U,"chatdataU2U")

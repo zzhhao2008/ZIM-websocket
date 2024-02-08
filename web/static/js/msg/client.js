@@ -120,6 +120,7 @@ function connectWebSocket() {
                 }
                 addMsgbox(recvdata.cid,fmb)
                 if(recvdata.cid==nowChatingId){
+                    fmb['name']=tdata.sname;
                     viewNewMsg(fmb)
                     chatBody.scrollTo(0, chatBody.scrollHeight)
                 }
@@ -141,6 +142,9 @@ function connectWebSocket() {
                 if (nowChatingId == "ai"){
                     openChatWindow("ai")
                 }
+                break;
+            case "useAiChat":
+                chatInput.value=recvdata.content
                 break;
         }
     }
@@ -181,4 +185,8 @@ function addFriend(id) {
     if (confirm("确定添加好友？")) {
         socket.send(JSON.stringify({ 'type': 'addFriend', 'id': id ,"token":token}));
     }
+}
+function useAIChat(){
+    if(nowChatingId==-1) return;
+    socket.send(JSON.stringify({ 'type': 'useAiChat', 'cid': nowChatingId ,"token":token}));
 }
