@@ -1,0 +1,21 @@
+{
+    "1": {
+        "id": "1",
+        "member": [
+            "zzh",
+            "test"
+        ],
+        "msgs": [
+            {
+                "sid": "zzh",
+                "content": "114514",
+                "time": 123
+            },
+            {
+                "sid": "test",
+                "content": "mydevice!",
+                "time": 45645646
+            }
+        ]
+    }
+}

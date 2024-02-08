@@ -3,13 +3,17 @@ import websockets
 import json
 import requests
 import time
+import datacommd as db
 clients = {}
 users = {}
 databseurl = "https://chat.zsvstudio.top/api/"
-chatdataU2U = {1: {'id': 1, "member": ['zzh', 'test'], "msgs": [{"sid": "zzh", "content": "114514", "time": 123}, {
-    "sid": "test", "content": "mydevice!", "time": 45645646}]}}  # 用户和用户对话
-friends = {'zzh': [{"uid": 'test', "cid": 1}],'test': [{"uid": 'zzh', "cid": 1}]}
+chatdataU2U = {}  # 用户和用户对话
+friends = {}
 recents={}
+
+chatdataU2U = db.read_data("chatdataU2U")
+friends = db.read_data("friends")
+recents = db.read_data("recents")
 
 # 异步函数，接收客户端连接
 async def main(nowcli):
@@ -107,6 +111,7 @@ async def main(nowcli):
                         rcr={}
                     rdata = {"fri": friendList, "msg": msglist,"read":rcr,"status": "ok", "type": "getRecent"}
                     await nowcli.send(json.dumps(rdata))
+                    continue
                 case "sendMsg":
                     # 发送消息
                     cid = mes["cid"]
@@ -135,6 +140,7 @@ async def main(nowcli):
                                 if uidn not in recents:
                                     recents[uidn]={}
                                 recents[uidn][cid]=mesdata
+                                db.write_data(recents,"recents")
                 case "getMsg":
                     #获取全部消息
                     cid = mes["cid"]
@@ -147,6 +153,7 @@ async def main(nowcli):
                         onames[i]=users[i]['name']
                     rdata = {"status": "ok", "type": "getMsg","code":200,"msg":chatdataU2U[cid],"cid":cid,"onames":onames}
                     await nowcli.send(json.dumps(rdata))
+                    continue
                 case "delFriend":
                     #删除好友操作
                     fid = mes["id"]
@@ -165,6 +172,7 @@ async def main(nowcli):
                             if fid in clients:
                                 await clients[fid].send(json.dumps(rdata))
                             break
+                    db.write_data(friends,"friends")
                 case "addFriend":
                     fid=mes["id"]
                     alltext = requests.get(databseurl+"userAll").text
@@ -195,7 +203,7 @@ async def main(nowcli):
                             notExi=False
                             break
                     if notExi :
-                        cid=len(chatdataU2U)+1
+                        cid=str(len(chatdataU2U)+1)
                         myinfo={"uid":fid,"cid":cid,"time":time.time()}
                         friends[uid].append(myinfo)
                         finfo={"uid":uid,"cid":cid,"time":time.time()}
@@ -208,8 +216,10 @@ async def main(nowcli):
                         rdata={"status":uid+"将你添加到好友","type":"addFriend","code":200,"cid":cid}
                         if fid in clients:
                             await clients[fid].send(json.dumps(rdata))
-
-
+                        db.write_data(friends,"friends")
+            
+            #把数据保存
+            db.write_data(chatdataU2U,"chatdataU2U")
     # 如果客户端断开连接，则从clients中删除该客户端，并从users中删除该用户的登录信息
     except websockets.exceptions.ConnectionClosedOK:
         print("Connection closed", nowcli)

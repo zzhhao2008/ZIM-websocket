@@ -1,2 +1,2 @@
-py server.py
+py socketserver.py
 PAUSE
