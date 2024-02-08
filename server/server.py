@@ -5,7 +5,7 @@ import requests
 import time
 clients = {}
 users = {}
-databseurl = "http://127.0.0.1/api/"
+databseurl = "https://chat.zsvstudio.top/api/"
 chatdataU2U = {1: {'id': 1, "member": ['zzh', 'test'], "msgs": [{"sid": "zzh", "content": "114514", "time": 123}, {
     "sid": "test", "content": "mydevice!", "time": 45645646}]}}  # 用户和用户对话
 friends = {'zzh': [{"uid": 'test', "cid": 1}],'test': [{"uid": 'zzh', "cid": 1}]}
@@ -27,6 +27,7 @@ async def main(nowcli):
         await nowcli.close()
         return
     # 将验证成功后的数据转换成json格式
+    print("Auth Success", usertext)
     userinfo = json.loads(usertext)
     # 获取token和uid
     token = userinfo['token']
@@ -45,6 +46,8 @@ async def main(nowcli):
     users[uid] = userinfo
     print(userinfo)
     # 返回登录成功的信息
+    if uid not in friends:
+        friends[uid] = []
     await nowcli.send(json.dumps({"token": token, "status": "ok", "type": "auth"}))
     try:
         # 循环接收客户端发送的消息
